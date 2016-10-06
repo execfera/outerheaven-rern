@@ -33,45 +33,57 @@ $(document).data("readyDeferred", $.Deferred()).ready(function() {
 });
 
 $.when( $(document).data("readyDeferred"), chipGet ).done (function() {
-  $('.c_post:contains("[chip="):not(:has("textarea"))').each(function () {
-	$(this).html().replace(/\[chip=([^,\]]*)(,(i|s|f|a))?\]/g, function(match, p1, p2, p3) {
-      if (!(p1 in chipData)) return match; else return chipTagReplace("chip",p1,p3);
-	  });
-  });
-  $('.c_sig:contains("[chip="):not(:has("textarea"))').each(function () {
-	$(this).html().replace(/\[chip=([^,\]]*)(,(i|s|f|a))?\]/g, function(match, p1, p2, p3) {
-      if (!(p1 in chipData)) return match; else return chipTagReplace("sig",p1,p3);
-	  });
-  });
-  chipTagFunction();
-});
-
-function chipTagReplace(area, name, parameter) {
-	  switch(parameter) {
+  $('.c_post:contains("[chip="):not(:has("textarea"))').each(function() {
+    $(this).html($(this).html().replace(/\[chip=([^,\]]*)(,(i|s|f|a))?\]/g, function(match, p1, p2, p3) {
+          if (!(p1 in chipData)) return match; else {
+	  switch(p3) {
 	    case "i":
-		  return "<img src='" + chipData[name].chip_img + "'>";
+		  return "<img src='" + chipData[p1].img + "'>";
 		case "s":
-		  return chipData[name].chip_summ;
+		  return chipData[p1].summ;
 		case "f":
-		  return "<img src='" + chipData[name].chip_img + "'> " + "<span class='chip'><span class='chipclick'>" + name + "</span><span class='chipbody" + area + "'>" + chipData[name].chip_desc + "</span></span>";
+		  return "<img src='" + chipData[p1].img + "'> " + "<span class='chip'><span class='chipclick'>" + p1 + "</span><span class='chipbody'>" + chipData[p1].desc + "</span></span>";
 		case "a":
-		  if (!("chip_alias" in chipData[name])) return match; else return "<img src='" + chipData[name].chip_img + "'> " + "<span class='chip'><span class='chipclick'>" + chipData[name].chip_alias + "</span><span class='chipbody" + area + "'>" + chipData[name].chip_desc + "</span></span>";
+		  if (!("alias" in chipData[p1])) return match; else return "<img src='" + chipData[p1].img + "'> " + "<span class='chip'><span class='chipclick'>" + chipData[p1].alias + "</span><span class='chipbody'>" + chipData[p1].desc + "</span></span>";
 		default: 
 		  var elcolor; 
-		  switch (chipData[name].chip_elem) {
-				case "Fire": elcolor = "<font color=#d22700>" + name + "</font>"; break;
-				case "Aqua": elcolor = "<font color=#6495ed>" + name + "</font>"; break;
-				case "Elec": elcolor = "<font color=#dbcd00>" + name + "</font>"; break;
-				case "Wood": elcolor = "<font color=#00c96b>" + name + "</font>"; break;
-				default: elcolor = name; break;
+		  switch (chipData[p1].elem) {
+				case "Fire": elcolor = "<font color=#d22700>" + p1 + "</font>"; break;
+				case "Aqua": elcolor = "<font color=#6495ed>" + p1 + "</font>"; break;
+				case "Elec": elcolor = "<font color=#dbcd00>" + p1 + "</font>"; break;
+				case "Wood": elcolor = "<font color=#00c96b>" + p1 + "</font>"; break;
+				default: elcolor = p1; break;
 		  }		
-		  return "<img src='" + chipData[name].chip_img + "'> <strong>" + elcolor + "</strong>: " + chipData[name].chip_summ;
-	}
-}
-
-function chipTagFunction () {
+		  return "<img src='" + chipData[p1].img + "'> <strong>" + elcolor + "</strong>: " + chipData[p1].summ;
+		  }}
+		}));
+	});
+  $('.c_sig:contains("[chip="):not(:has("textarea"))').each(function() {
+    $(this).html($(this).html().replace(/\[chip=([^,\]]*)(,(i|s|f|a))?\]/g, function(match, p1, p2, p3) {
+          if (!(p1 in chipData)) return match; else {
+	  switch(p3) {
+	  case "i": // image only
+		  return "<img src='" + chipData[p1].img + "'>";
+	  case "s": // summary only
+		  return chipData[p1].summ;
+	  case "f": // full clickable description
+		  return "<img src='" + chipData[p1].img + "'> " + "<span class='chip'><span class='chipclick'>" + p1 + "</span><span class='chipbodysig'>" + chipData[p1].desc + "</span></span>";
+		case "a":
+		  if (!("alias" in chipData[p1])) return match; else return "<img src='" + chipData[p1].img + "'> " + "<span class='chip'><span class='chipclick'>" + chipData[p1].alias + "</span><span class='chipbodysig'>" + chipData[p1].desc + "</span></span>";
+	  default:  // image + name + summary
+		  var elcolor; 
+		  switch (chipData[p1].elem) {
+				case "Fire": elcolor = "<font color=#d22700>" + p1 + "</font>"; break;
+				case "Aqua": elcolor = "<font color=#6495ed>" + p1 + "</font>"; break;
+				case "Elec": elcolor = "<font color=#dbcd00>" + p1 + "</font>"; break;
+				case "Wood": elcolor = "<font color=#00c96b>" + p1 + "</font>"; break;
+				default: elcolor = p1; break;
+		  }		
+		  return "<img src='" + chipData[p1].img + "'> <strong>" + elcolor + "</strong>: " + chipData[p1].summ;
+		  }}
+	  }));
+	});
   $(".chipbody").hide();
-  $(".chipbodypost").hide();
   $(".chipbodysig").hide();
   $(".chipclick").click(function(event) {
     $(this.nextSibling).toggle();
@@ -79,10 +91,9 @@ function chipTagFunction () {
   });
   $("body").click(function(event) {
   $(".chipbody").hide();
-  $(".chipbodypost").hide();
   $(".chipbodysig").hide();
   });
-  $(".chipbody,.chipbodypost,.chipbodysig").click(function(event) {
+  $(".chipbody,.chipbodysig").click(function(event) {
     event.stopPropagation();
 	return false;
   });
@@ -94,39 +105,5 @@ function chipTagFunction () {
     event.stopPropagation();
 	//return false;
   });
-}
-
-function Preview(e) {
-    e.preventDefault ? e.preventDefault() : e.returnValue = false;
-    if ($('#c_post-preview').length || $('#c_post textarea').val() || $('#txt_quote').val()) {
-        if (!$('#c_post-preview').length) {
-            $('#c_post').prepend("<div id='c_post-preview'></div>");
-        }
-        
-        var quote = $('#txt_quote'),
-        prepend_quote = quote.length && quote.val() ? "[quote]" + quote.val() + "[\/quote]" : "",
-        xhr = XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP");
-        
-        xhr.open('POST', main_url + 'tasks/', true);
-        xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-        xhr.setRequestHeader("Accepts", "*/*");
-        
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4 && xhr.status === 200) {
-                $('#c_post-preview').html(xhr.responseText);
-				$('.c_post:contains("[chip="):not(:has("textarea"))').each(function () {
-					$(this).html().replace(/\[chip=([^,\]]*)(,(i|s|f|a))?\]/g, function(match, p1, p2, p3) {
-					if (!(p1 in chipData)) return match; else return chipTagReplace("chip",p1,p3);
-					});
-				});
-                $('#c_post-preview div.spoiler_toggle').click(function () {
-                    $(this).next().toggle();
-                });
-			chipTagFunction();
-            }
-        };
-        
-        xhr.send($.param({ task: 5, post: prepend_quote + $("#c_post textarea").val() }));
-    }
-}
+  
+});
