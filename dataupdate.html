@@ -1,0 +1,72 @@
+<body><p>
+Remote MyJSON Chip/Virus Data Updater: Paste the updated JSON data here.
+</p>
+<textarea id="update" rows="20" cols="40"></textarea>
+<br />
+<p>
+<span id="up_area">
+  <input type="radio" name="area" value="chip" checked> Chip <input type="radio" name="area" value="mvl"> Canon Virus<br> <input type="radio" name="area" value="cvl"> Custom/Meta Virus<br><br>
+</span>
+  API Link for Target Data:
+</p>
+<textarea id="targeturl" rows="1" cols="40">https://api.myjson.com/bins/1c6zx</textarea>
+<br />
+<p>
+API Link for Target Timestamp Data:
+</p>
+<textarea id="targettimeurl" rows="1" cols="40">https://api.myjson.com/bins/10uw9</textarea>
+<br />
+<p>
+Status: 
+</p>
+<textarea id="data" rows="1" cols="40"></textarea>
+<br />
+<input id="clickMe" type="button" value="Upload Data" />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script>
+$("input[name='area']").change(function(){
+	switch($("input[name='area']:checked").val()) {
+		case "chip": $('#targeturl').val('https://api.myjson.com/bins/1c6zx'); 
+		$('#targettimeurl').val('https://api.myjson.com/bins/10uw9'); 
+		break;
+		case "mvl": $('#targeturl').val('https://api.myjson.com/bins/58zld'); 
+		$('#targettimeurl').val('https://api.myjson.com/bins/42wgx'); 
+		break;
+		case "cvl": $('#targeturl').val('https://api.myjson.com/bins/4ioie'); 
+		$('#targettimeurl').val('https://api.myjson.com/bins/1683a'); 
+		break;
+	}
+});
+
+var time = { "textStatus": "", "timestamp": 0, "timestring": "" };
+
+$("#clickMe").click(function () {
+          
+            //var updatedObj = update.value;
+            var updatedData = update.value;
+
+            // do update
+            var updateOK = $.ajax({
+                url: targeturl.value,
+                type: "PUT",
+                data: updatedData,
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data, textStatus, jqXHR) {}
+            });
+            updateOK.done(function(){
+            		time.textStatus = "success";
+                time.timestamp = $.now();
+                time.timestring = new Date(time.timestamp).toISOString();
+                $("#data").val("success: " + time.timestamp + " (" + time.timestring + ")");
+            		$.ajax({
+                				url: targettimeurl.value,
+                				type: "PUT",
+                				data: JSON.stringify(time),
+                				contentType: "application/json; charset=utf-8",
+                				dataType: "json",
+                        success: function (data, textStatus, jqXHR) {} 
+                      });
+            });
+});</script>
+</body>
