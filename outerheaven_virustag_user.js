@@ -28,7 +28,7 @@ function OpenVrWnd(srcname) {
 		write("");
 		write("<title>Virus Info<\/title>");
 		write("<\/head>");
-		write("<body bgcolor=\"#ffffff\">");
+		write("<body style=\"background-color: #eeeeee; font-family: \'Helvetica\', \'Arial\', \'Bitstream Vera Sans\', \'Verdana\', sans-serif; font-size:93.3%;\">");
 		write(foundentry1);
 		write(encodeURI(virusData[foundkey].family_url));
 		write(foundentry2);
