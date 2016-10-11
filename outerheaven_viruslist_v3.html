@@ -37,6 +37,7 @@ How to use: <ul><li>Input all relevant information, and click <strong>[Search]</
 		<option value="NAXA">NAXA</option>
 		<option value="NetVegas">NetVegas</option>
 		<option value="Undernet">Undernet</option>
+		<option value="All">All Nets</option>
 	</select> Net Rank: <select id="vlist_rank">
 		<option value=0 selected>Normal</option>
 		<option value=2>Rogue</option>
@@ -86,10 +87,11 @@ var netland = {
 	"Hades Isle": ["Normal", "Lava", "Coal", "Furnace", "Metal", "Sand"],
 	"NAXA": ["Normal", "Metal", "Magnet", "Solar", "Missing"],
 	"NetVegas": ["Normal", "Lava", "Coal", "Furnace", "Sea", "Ice", "Snow", "Metal", "Magnet", "Solar", "Grass", "Soil", "Mud", "Sand", "Quicksand", "Glass", "Poison", "Holy", "Cursed", "Cracked", "Broken", "Missing"],
-	"Undernet": ["Normal", "Lava", "Coal", "Furnace", "Sea", "Ice", "Snow", "Metal", "Magnet", "Solar", "Grass", "Soil", "Mud", "Sand", "Quicksand", "Glass", "Poison", "Holy", "Cursed", "Cracked", "Broken", "Glitched", "Missing"]
+	"Undernet": ["Normal", "Lava", "Coal", "Furnace", "Sea", "Ice", "Snow", "Metal", "Magnet", "Solar", "Grass", "Soil", "Mud", "Sand", "Quicksand", "Glass", "Poison", "Holy", "Cursed", "Cracked", "Broken", "Glitched", "Missing"],
+	"All": ["Normal", "Lava", "Coal", "Furnace", "Sea", "Ice", "Snow", "Metal", "Magnet", "Solar", "Grass", "Soil", "Mud", "Sand", "Quicksand", "Glass", "Poison", "Holy", "Cursed", "Cracked", "Broken", "Glitched", "Missing"]
 };
-var netmin = [3, 4, 4, 5, 0, 6, 6, 7, 7, 0, 9, 10, 9, 10, 0, 11, 12, 13, 14]
-var netmax = [4, 5, 6, 7, 0, 7, 7, 8, 9, 0, 10, 11, 12, 13, 0, 14, 15, 16, 16]
+var netmin = [3, 4, 4, 5, 0, 6, 6, 7, 7, 0, 9, 10, 9, 10, 0, 11, 12, 13, 14];
+var netmax = [4, 5, 6, 7, 0, 7, 7, 8, 9, 0, 10, 11, 12, 13, 0, 14, 15, 16, 16];
 var maxbat;
 
 var virusData1 = {};
@@ -145,8 +147,6 @@ if((localStorage.getItem("vDataCache2")) && (parseInt(localStorage.getItem("vCac
 // Part 2 Viruslist: https://api.myjson.com/bins/4ioie
 // Part 2 Timestamp: https://api.myjson.com/bins/1683a
 
-
-
 $.when( virusGet1, virusGet2 ).done(function() {
 	virusData = Object.assign(virusData1, virusData2);
 	virusGet.resolve();
@@ -158,6 +158,7 @@ $(window).unload(function() {
 localStorage.removeItem('vDataCache');
 localStorage.removeItem('vCacheTime');
 $('#vlist_rank').removeProp('disabled');
+$('#vlist_battle').removeProp('disabled');
 $('#vlist_info1, #vlist_info2, #vlist_md, #vlist_mmc, #vlist_rmmc, #vlist_reset, #vlist_meta, #vlist_random, #vlist_addsp, #vlist_addobj, #vlist_clear').hide();
 $('#vlist_resex').show();
 $('#vlist_area').change(function() {
@@ -219,6 +220,14 @@ virusGet.done (function() {
 					else $('#vlist_res').append(virusopt, virusentry);
 				}
 			}
+			else if (netarea === "All") {
+				var virusentryx = virusData[key].virus[netrankx].name + " <span class='mini'>(" + key + ")</span><br>";
+				var virusoptx = "<span class='mini' id='" + key + "-" + netrankx + "'><span class='vlist_add'>[+]</span> <span class='vlist_info1'>[1]</span> <span class='vlist_info2'>[2]</span> </span>";
+				$('#vlist_resex').show();
+				$('#vlist_resex').append(virusoptx, virusentryx); 
+				$('#vlist_res').append(virusopt, virusentry);
+				
+			}
 			else if ($.inArray(netarea, virusData[key].family_area) > -1) {
 				if (netbat > 5) { 
 					var virusentryx = virusData[key].virus[netrankx].name + " <span class='mini'>(" + key + ")</span><br>";
@@ -238,26 +247,26 @@ virusGet.done (function() {
 		$('.vlist_add').click(function() {
 			var akey = $(this).parent().prop("id").slice(0, -2);
 			var arank = parseInt($(this).parent().prop("id").slice(-1), 10);
-			var tvirus = "<span class='vlist_remv'><span class='vlist_entv'>" + virusData[akey].virus[arank].name + "</span>: "+ virusData[akey].virus[arank].hpts + " HP" + "<br></span>";
+			var tvirus = "<span class='vlist_remv'>[virus]<span class='vlist_entv'>" + virusData[akey].virus[arank].name + "</span>[/virus]<span class='vlist_entvi'></span>: "+ virusData[akey].virus[arank].hpts + " HP" + "<br></span>";
 			if ($('.vlist_entv').filter(function() { return $(this).text() === virusData[akey].virus[arank].name; }).length > 0) {
 				$('.vlist_entv').filter(function() { return $(this).text() === virusData[akey].virus[arank].name; }).parent().last().after(tvirus);
 			}
 			else $('#vlist_tempvirus').append(tvirus);
-			$('.vlist_entv').filter(function() { return $(this).text() === virusData[akey].virus[arank].name; }).next(".vlist_entvi").remove();
+			$('.vlist_entv').filter(function() { return $(this).text() === virusData[akey].virus[arank].name; }).next(".vlist_entvi").empty();
 			if ($(".vlist_entv").filter(function() { return $(this).text() === virusData[akey].virus[arank].name; }).length > 1) {
 				$(".vlist_entv").filter(function() { return $(this).text() === virusData[akey].virus[arank].name; }).each(function(index) {
-					$(this).after("<span class='vlist_entvi'> " + String.fromCharCode(65 + index) + "</span>");
+					$(this).next(".vlist_entvi").html(" " + String.fromCharCode(65 + index));
 				});
 			}
 			$('.vlist_mdhp').html($('.vlist_entv').length*5);
 			$(".vlist_remv").unbind( "click" );
 			$('.vlist_remv').click(function() {
 				tvirus = $(".vlist_entv", this).text();
-				$('.vlist_entv').filter(function() { return $(this).text() === tvirus; }).next(".vlist_entvi").remove();
+				$('.vlist_entv').filter(function() { return $(this).text() === tvirus; }).next(".vlist_entvi").empty();
 				$(this).remove();
 				if ($('.vlist_entv').filter(function() { return $(this).text() === tvirus; }).length > 1) {
 					$('.vlist_entv').filter(function() { return $(this).text() === tvirus; }).each(function(index) {
-						$(this).after("<span class='vlist_entvi'> " + String.fromCharCode(65 + index) + "</span>");
+						$(this).next(".vlist_entvi").html(" " + String.fromCharCode(65 + index));
 					});
 				}
 				$('.vlist_mdhp').html($('#vlist_tempvirus .vlist_entv').length*5);
@@ -332,26 +341,26 @@ virusGet.done (function() {
 			$('.vlist_add').click(function() {
 				var akey = $(this).parent().prop("id").slice(0, -2);
 				var arank = parseInt($(this).parent().prop("id").slice(-1), 10);
-				var tvirus = "<span class='vlist_remv'><span class='vlist_entv'>" + virusData[akey].virus[arank].name + "</span>: "+ virusData[akey].virus[arank].hpts + " HP" + "<br></span>";
+				var tvirus = "<span class='vlist_remv'>[virus]<span class='vlist_entv'>" + virusData[akey].virus[arank].name + "</span>[/virus]<span class='vlist_entvi'></span>: "+ virusData[akey].virus[arank].hpts + " HP" + "<br></span>";
 				if ($('.vlist_entv').filter(function() { return $(this).text() === virusData[akey].virus[arank].name; }).length > 0) {
 					$('.vlist_entv').filter(function() { return $(this).text() === virusData[akey].virus[arank].name; }).parent().last().after(tvirus);
 				}
 				else $('#vlist_tempvirus').append(tvirus);
-				$('.vlist_entv').filter(function() { return $(this).text() === virusData[akey].virus[arank].name; }).next(".vlist_entvi").remove();
+				$('.vlist_entv').filter(function() { return $(this).text() === virusData[akey].virus[arank].name; }).next(".vlist_entvi").empty();
 				if ($(".vlist_entv").filter(function() { return $(this).text() === virusData[akey].virus[arank].name; }).length > 1) {
 					$(".vlist_entv").filter(function() { return $(this).text() === virusData[akey].virus[arank].name; }).each(function(index) {
-						$(this).after("<span class='vlist_entvi'> " + String.fromCharCode(65 + index) + "</span>");
+						$(this).next(".vlist_entvi").html(" " + String.fromCharCode(65 + index));
 					});
 				}
 				$('.vlist_mdhp').html($('.vlist_entv').length*5);
 				$(".vlist_remv").unbind( "click" );
 				$('.vlist_remv').click(function() {
 					tvirus = $(".vlist_entv", this).text();
-					$('.vlist_entv').filter(function() { return $(this).text() === tvirus; }).next(".vlist_entvi").remove();
+					$('.vlist_entv').filter(function() { return $(this).text() === tvirus; }).next(".vlist_entvi").empty();
 					$(this).remove();
 					if ($('.vlist_entv').filter(function() { return $(this).text() === tvirus; }).length > 1) {
 						$('.vlist_entv').filter(function() { return $(this).text() === tvirus; }).each(function(index) {
-							$(this).after("<span class='vlist_entvi'> " + String.fromCharCode(65 + index) + "</span>");
+							$(this).next(".vlist_entvi").html(" " + String.fromCharCode(65 + index));
 						});
 					}
 					$('.vlist_mdhp').html($('#vlist_tempvirus .vlist_entv').length*5);
